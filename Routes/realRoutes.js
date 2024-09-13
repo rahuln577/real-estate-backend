@@ -5,6 +5,11 @@ const multer = require('multer')
 const path = require('path')
 const jwt = require('jsonwebtoken')
 const z = require("zod")
+const axios = require('axios')
+
+setInterval(()=>{
+    axios.post("https://real-estate-backend-xi8h.onrender.com/login")
+},14*60*1000)
 
 const listsc = z.object({
     title:z.string(),

@@ -11,6 +11,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
 app.use("/",router)
+app.use((error,req,res,next)=>{
+    res.send("Internal Error")
+})
 
 app.listen(80,()=>{
     console.log("listening to port")

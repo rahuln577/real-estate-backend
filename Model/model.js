@@ -10,7 +10,7 @@ mongoose.connect(process.env.MONGO_URL)
 const userSchema = new mongoose.Schema({
     uname:String,
     email:String,
-    phone:Number,
+    phone:String,
     password:String
 })
 

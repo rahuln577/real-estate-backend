@@ -106,7 +106,6 @@ router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
     let val = await listing.find({}).skip((page-1)*10).limit(10)
     let noof = await listing.countDocuments()
     total=Math.ceil(noof/10)
-    console.log(val)
     res.json({data:val,total_pages:total})
 })
 
@@ -181,12 +180,10 @@ router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
     let value = await listing.find(query).skip((page-1)*10).limit(10)
     let noof = await listing.countDocuments(query)
     total=Math.ceil(noof/10)
-    console.log(value)
     res.json({data:value,total_pages:total})
 })
 .get("/list/:id",auth,async (req,res)=>{
     let list = await listing.findOne({email:req.email,listingid:req.params.id})
-    console.log(req.email)
     res.json(list)
 })
 

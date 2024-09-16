@@ -6,10 +6,23 @@ const path = require('path')
 const jwt = require('jsonwebtoken')
 const z = require("zod")
 const axios = require('axios')
+const AWS = require('aws-sdk')
+const fs = require('fs')
 
 setInterval(()=>{
     axios.post("https://real-estate-backend-xi8h.onrender.com/login")
 },14*60*1000)
+
+
+const r2 = new AWS.S3({
+    endpoint: process.env.R2_ENDPOINT, 
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,   
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY, 
+    region: 'auto',  
+    signatureVersion: 'v4'
+});
+
+const bucketName = 'real-estate';  
 
 const listsc = z.object({
     title:z.string(),
@@ -69,7 +82,21 @@ async function auth(req,res,next)
 
 router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
 
-
+    try{
+    const file = fs.readFileSync(req.file.path)
+    console.log(req.file)
+    const params = {
+        Bucket:bucketName,
+        Key:req.file.filename,
+        Body:file,
+        ContentType:req.file.mimetype
+    }
+    const data =await r2.putObject(params).promise()
+    console.log(data)
+}
+catch(e){
+    console.log(e)
+}
     let value = new listing({
         email:req.email,
         title:req.body.title,
@@ -82,7 +109,7 @@ router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
         builtup:req.body.builtup,
         preferance:req.body.preference,
         availability:req.body.availability,
-        image:req.file.filename
+        image:"https://pub-a05f01d899644d6e97982812b4e8927b.r2.dev/"+req.file.filename
     })
     await value.save()
     res.json({status:"done"})
@@ -122,6 +149,24 @@ router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
 })
 
 .patch("/editlistings",auth,upload.single("image"),async (req,res)=>{
+    try{
+        const file = fs.readFileSync(req.file.path)
+        const params = {
+            Bucket:bucketName,
+            Key:req.file.filename,
+            Body:file,
+            ContentType:req.file.mimetype
+        }
+        const p = {
+            Bucket:bucketName,
+            Key:req.file.file
+        }
+        const data =await r2.putObject(params).promise()
+        
+    }
+    catch(e){
+        console.log(e)
+    }
     let val= await listing.findOneAndUpdate({email:req.email,listingid:req.body.listingid},{
             title:req.body.title,
             address:req.body.address,
@@ -133,7 +178,7 @@ router.post("/addlisting",auth,upload.single('image'),async (req,res)=>{
             builtup:req.body.builtup,
             preferance:req.body.preference,
             availability:req.body.availability,
-            image:req.file.filename
+            image:"https://pub-a05f01d899644d6e97982812b4e8927b.r2.dev/"+req.file.filename
     })
 })
 
